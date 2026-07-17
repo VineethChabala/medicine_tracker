@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: medicine_tracker
+      POSTGRES_USER: tracker_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tracker_admin -d medicine_tracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    mem_limit: 256m
+    restart: always
+
+  api:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://tracker_admin:${DB_PASSWORD:-secret123}@db:5432/medicine_tracker
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      JWT_SECRET: ${JWT_SECRET:-changeme_use_a_real_secret_in_production}
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 15
+      REFRESH_TOKEN_EXPIRE_DAYS: 30
+      WEBHOOK_URL: ${WEBHOOK_URL:-}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    mem_limit: 512m
+    restart: always
+
+volumes:
+  pgdata:

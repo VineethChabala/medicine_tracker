@@ -1,0 +1,33 @@
+# FastAPI core
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.19
+
+# Database
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+
+# Auth
+python-jose[cryptography]==3.3.0
+bcrypt==4.2.1
+
+# Config
+pydantic-settings>=2.6.1
+pydantic[email]>=2.12.5,<3.0.0
+
+# HTTP client
+# httpx>=0.28.1 required by google-genai 2.x
+httpx>=0.28.1,<1.0.0
+
+# Scheduling
+apscheduler==3.10.4
+
+# Note: python-telegram-bot is NOT needed.
+# We call the Telegram Bot API directly via httpx (see app/services/telegram_service.py).
+
+# Google Gemini
+google-genai==2.12.1
+
+# Web search for drug composition (Layer 3) — free, no API key needed
+duckduckgo-search==6.3.7
