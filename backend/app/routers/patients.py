@@ -181,8 +181,10 @@ async def generate_link_token(
     """Generates a short-lived 6-digit code for a patient to link their Telegram account."""
     await _require_patient_access(patient_id, current_user, db)
     from app.services.auth_service import generate_short_link_code
+    from app.services.telegram_service import get_bot_username
     token = generate_short_link_code(f"patient:{patient_id}")
-    return GenerateLinkTokenResponse(token=token)
+    bot_username = await get_bot_username()
+    return GenerateLinkTokenResponse(token=token, bot_username=bot_username)
 
 
 @router.post("/me/link-token", response_model=GenerateLinkTokenResponse)
@@ -191,6 +193,8 @@ async def generate_caregiver_link_token(
 ):
     """Generates a short-lived 6-digit code for the caregiver to link their own Telegram account."""
     from app.services.auth_service import generate_short_link_code
+    from app.services.telegram_service import get_bot_username
     token = generate_short_link_code(f"caregiver:{current_user.id}")
-    return GenerateLinkTokenResponse(token=token)
+    bot_username = await get_bot_username()
+    return GenerateLinkTokenResponse(token=token, bot_username=bot_username)
 

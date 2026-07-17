@@ -71,7 +71,7 @@ async def _gemini_extract_generics(drug_name: str) -> dict:
             "If you are not certain, set confidence to 'low' and generic_names to an empty array."
         )
         response = await client.aio.models.generate_content(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(response_mime_type="application/json"),
         )
@@ -136,7 +136,7 @@ async def _gemini_parse_composition_text(drug_name: str, text: str) -> dict:
             "Only include confirmed ingredients, not brand names."
         )
         response = await client.aio.models.generate_content(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(response_mime_type="application/json"),
         )

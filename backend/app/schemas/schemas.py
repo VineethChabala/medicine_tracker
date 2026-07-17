@@ -183,3 +183,4 @@ class ConfirmScanRequest(BaseModel):
 class GenerateLinkTokenResponse(BaseModel):
     token: str
     expires_in_minutes: int = 30
+    bot_username: Optional[str] = None

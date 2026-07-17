@@ -290,6 +290,9 @@ async def process_telegram_update(update: Dict[str, Any], db: AsyncSession):
 
     if text == "/start":
         await handle_start(chat_id, db)
+    elif text.startswith("/start "):
+        token = text[7:].strip()
+        await handle_link(chat_id, token, db)
     elif text == "/link" or text.startswith("/link"):
         token = text[5:].strip()
         if not token:

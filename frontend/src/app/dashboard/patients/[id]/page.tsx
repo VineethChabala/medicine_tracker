@@ -92,6 +92,7 @@ export default function PatientDetailPage() {
   const [copied, setCopied] = useState(false);
   const [newCaregiverEmail, setNewCaregiverEmail] = useState("");
   const [newCaregiverRole, setNewCaregiverRole] = useState("secondary");
+  const [botUsername, setBotUsername] = useState<string | null>(null);
 
   const handleCopy = async () => {
     if (!linkToken) return;
@@ -198,6 +199,7 @@ export default function PatientDetailPage() {
     try {
       const { data } = await patients.getLinkToken(id);
       setLinkToken(data.token);
+      setBotUsername(data.bot_username);
     } catch {
       alert("Failed to generate link token.");
     }
@@ -267,30 +269,40 @@ export default function PatientDetailPage() {
                   Get Telegram Link Code
                 </button>
               ) : (
-                <div className="flex items-center gap-3 bg-slate-900/60 border border-slate-700/50 rounded-xl p-2.5">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Bot Code</span>
-                    <code className="text-emerald-400 font-mono font-bold text-lg leading-tight">
-                      /link {linkToken}
-                    </code>
-                  </div>
-                  <button
-                    onClick={handleCopy}
-                    className="p-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 hover:text-white rounded-lg border border-slate-700 transition flex items-center justify-center gap-1.5 min-w-[75px]"
-                  >
-                    {copied ? (
-                      <>
+                <div className="flex items-center gap-4 flex-wrap">
+                  <div className="flex items-center gap-3 bg-slate-900/60 border border-slate-700/50 rounded-xl p-2.5">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Bot Code</span>
+                      <code className="text-emerald-400 font-mono font-bold text-lg leading-tight">
+                        /link {linkToken}
+                      </code>
+                    </div>
+                    <button
+                      onClick={handleCopy}
+                      className="p-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 hover:text-white rounded-lg border border-slate-700 transition flex items-center justify-center gap-1.5 min-w-[75px]"
+                    >
+                      {copied ? (
                         <span className="text-xs text-emerald-400 font-medium">Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
-                        </svg>
-                        <span className="text-xs font-medium">Copy</span>
-                      </>
-                    )}
-                  </button>
+                      ) : (
+                        <>
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
+                          </svg>
+                          <span className="text-xs font-medium">Copy</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  {botUsername && (
+                    <a
+                      href={`https://t.me/${botUsername}?start=${linkToken}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-5 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition shadow-lg shadow-blue-500/15 text-sm flex items-center gap-2"
+                    >
+                      💬 Open in Telegram
+                    </a>
+                  )}
                 </div>
               )}
             </div>

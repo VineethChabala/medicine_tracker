@@ -50,3 +50,24 @@ async def set_webhook(webhook_url: str) -> bool:
     except Exception as e:
         logger.error(f"Failed to set Telegram webhook: {e}")
     return False
+
+
+_bot_username = None
+
+async def get_bot_username() -> str:
+    """Fetches the bot username from Telegram getMe API and caches it."""
+    global _bot_username
+    if _bot_username:
+        return _bot_username
+    if not settings.telegram_bot_token:
+        return "medicine_refill_tracker_bot"
+    try:
+        url = f"https://api.telegram.org/bot{settings.telegram_bot_token}/getMe"
+        async with httpx.AsyncClient(timeout=5) as client:
+            resp = await client.get(url)
+            if resp.status_code == 200:
+                _bot_username = resp.json().get("result", {}).get("username")
+                return _bot_username
+    except Exception as e:
+        logger.error(f"Failed to fetch bot username: {e}")
+    return "medicine_refill_tracker_bot"

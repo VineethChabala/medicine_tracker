@@ -80,6 +80,7 @@ async def add_medication(
         warnings = await check_new_medication_interactions(
             new_med_name=body.name,
             new_rxcui=resolution["rxcui"],
+            new_generic_names=resolution.get("generic_names", []),
             patient_id=patient_id,
             session=db,
         )

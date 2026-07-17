@@ -160,6 +160,7 @@ async def confirm_scan(
             warnings = await check_new_medication_interactions(
                 new_med_name=med_data.name,
                 new_rxcui=resolution["rxcui"],
+                new_generic_names=resolution.get("generic_names", []),
                 patient_id=patient_id,
                 session=db,
             )
