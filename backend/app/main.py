@@ -77,12 +77,13 @@ async def lifespan(app: FastAPI):
     # Start polling or set webhook
     polling_task = None
     if settings.webhook_url and settings.telegram_bot_token:
-        full_webhook_url = f"{settings.webhook_url.rstrip('/')}/api/webhook"
+        full_webhook_url = f"{settings.webhook_url.strip().rstrip('/')}/api/webhook/"
+        logger.info(f"Registering Telegram webhook: {full_webhook_url}")
         ok = await set_webhook(full_webhook_url)
         if ok:
-            logger.info(f"Telegram webhook set: {full_webhook_url}")
+            logger.info(f"Telegram webhook registered successfully: {full_webhook_url}")
         else:
-            logger.warning("Failed to set Telegram webhook — check BOT_TOKEN and WEBHOOK_URL")
+            logger.warning(f"Failed to set Telegram webhook — URL tried: {full_webhook_url}")
     elif settings.telegram_bot_token:
         polling_task = asyncio.create_task(telegram_polling_runner())
 
