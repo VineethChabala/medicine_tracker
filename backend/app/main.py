@@ -64,9 +64,10 @@ async def lifespan(app: FastAPI):
     # ── Startup ──────────────────────────────────────────────────────────
     logger.info("Starting Medicine Refill Tracker API...")
 
-    # Create DB tables (Alembic handles production migrations; this is for dev convenience)
+    # Ensure tables exist — checkfirst=True skips tables that already exist,
+    # so this is safe to run alongside Alembic migrations.
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(Base.metadata.create_all, checkfirst=True)
     logger.info("Database tables verified.")
 
     # Start APScheduler
