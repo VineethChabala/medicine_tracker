@@ -31,3 +31,4 @@ google-genai==2.12.1
 
 # Web search for drug composition (Layer 3) — free, no API key needed
 duckduckgo-search==6.3.7
+psycopg2
