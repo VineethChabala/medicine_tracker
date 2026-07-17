@@ -15,9 +15,8 @@ from app.config import settings
 config = context.config
 
 # Set the SQLAlchemy URL from our settings
-# Convert asyncpg URL to sync for Alembic (replace asyncpg with psycopg2 for migrations)
-sync_url = settings.database_url.replace("postgresql+asyncpg://", "postgresql://")
-config.set_main_option("sqlalchemy.url", sync_url)
+# settings.database_url already has postgresql+asyncpg:// scheme (fixed by field_validator)
+config.set_main_option("sqlalchemy.url", settings.database_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
