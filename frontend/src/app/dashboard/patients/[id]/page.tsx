@@ -88,6 +88,7 @@ export default function PatientDetailPage() {
   const [interactionWarnings, setInteractionWarnings] = useState<InteractionWarning[]>([]);
   const [saving, setSaving] = useState(false);
   const [inviting, setInviting] = useState(false);
+  const [recordingDose, setRecordingDose] = useState<string | null>(null);
   const [linkToken, setLinkToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [newCaregiverEmail, setNewCaregiverEmail] = useState("");
@@ -192,6 +193,19 @@ export default function PatientDetailPage() {
       alert(msg || "Failed to add medication.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleRecordDose = async (medId: string) => {
+    setRecordingDose(medId);
+    try {
+      await medications.recordDose(medId);
+      fetchData(); // Refresh to show updated quantity
+    } catch (err: any) {
+      const msg = err.response?.data?.detail || "Failed to record dose.";
+      alert(msg);
+    } finally {
+      setRecordingDose(null);
     }
   };
 
@@ -361,7 +375,7 @@ export default function PatientDetailPage() {
                           <DaysBar days={med.days_remaining} threshold={med.refill_threshold_days} />
                         </div>
 
-                        <div className="text-right shrink-0">
+                        <div className="text-right shrink-0 flex flex-col items-end gap-2">
                           <div
                             className={`text-2xl font-bold ${
                               med.days_remaining <= 3
@@ -374,6 +388,18 @@ export default function PatientDetailPage() {
                             {med.days_remaining.toFixed(1)}d
                           </div>
                           <p className="text-slate-500 text-xs">remaining</p>
+                          <button
+                            id={`take-dose-${med.id}`}
+                            onClick={() => handleRecordDose(med.id)}
+                            disabled={recordingDose === med.id || med.quantity_on_hand <= 0}
+                            className={`mt-1 px-3 py-1.5 text-xs font-semibold rounded-lg border transition ${
+                              med.quantity_on_hand <= 0
+                                ? "border-slate-700 text-slate-600 cursor-not-allowed"
+                                : "border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 active:scale-95"
+                            }`}
+                          >
+                            {recordingDose === med.id ? "..." : med.quantity_on_hand <= 0 ? "Empty" : "✓ Take Dose"}
+                          </button>
                         </div>
                       </div>
                     </div>

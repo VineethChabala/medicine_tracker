@@ -127,6 +127,32 @@ async def update_medication(
     return med
 
 
+@router.post("/medications/{med_id}/record-dose", response_model=MedicationOut)
+async def record_dose(
+    med_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Record that one dose was taken, decrementing quantity_on_hand by 1."""
+    stmt = (
+        select(Medication)
+        .join(CaregiverPatient, CaregiverPatient.patient_id == Medication.patient_id)
+        .where(Medication.id == med_id, CaregiverPatient.caregiver_id == current_user.id)
+    )
+    result = await db.execute(stmt)
+    med = result.scalar_one_or_none()
+    if not med:
+        raise HTTPException(status_code=404, detail="Medication not found.")
+
+    if med.quantity_on_hand <= 0:
+        raise HTTPException(status_code=400, detail="Quantity is already 0. Please refill first.")
+
+    med.quantity_on_hand = max(0.0, med.quantity_on_hand - 1.0)
+    await db.flush()
+    await db.refresh(med)
+    return med
+
+
 @router.delete("/medications/{med_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_medication(
     med_id: uuid.UUID,

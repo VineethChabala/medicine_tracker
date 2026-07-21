@@ -83,6 +83,8 @@ export const medications = {
   update: (medId: string, data: object) =>
     api.patch(`/medications/${medId}`, data),
   delete: (medId: string) => api.delete(`/medications/${medId}`),
+  recordDose: (medId: string) =>
+    api.post(`/medications/${medId}/record-dose`),
 };
 
 export const prescriptions = {

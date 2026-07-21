@@ -38,6 +38,13 @@ async def daily_refill_check():
         rows = result.all()
 
         for med, patient in rows:
+            # ── Auto-decrement quantity consumed today ─────────────────────────
+            today = date.today()
+            daily_consumption = med.frequency_per_day  # doses/day = units consumed per day
+            med.quantity_on_hand = max(0.0, med.quantity_on_hand - daily_consumption)
+            # Flush so days_remaining recalculates off the updated quantity
+            await session.flush()
+
             days_left = med.days_remaining
 
             threshold = med.refill_threshold_days
@@ -56,7 +63,7 @@ async def daily_refill_check():
                 f"{level} for *{patient.full_name}*\n\n"
                 f"{emoji} *{med.name}* — {days_left:.1f} days remaining\n"
                 f"📦 Stock: {med.quantity_on_hand:.0f} {med.dose_unit}(s)\n"
-                f"📅 Today: {date.today().strftime('%d %b %Y')}\n\n"
+                f"📅 Today: {today.strftime('%d %b %Y')}\n\n"
                 f"_Please refill soon to avoid missing doses._"
             )
 
